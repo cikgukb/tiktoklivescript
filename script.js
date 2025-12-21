@@ -96,13 +96,15 @@ function saveData() {
     ];
     ids.forEach(id => {
         const el = document.getElementById(id);
-        funnelData[id] = el.type === 'checkbox' ? el.checked : el.value;
+        if (el) funnelData[id] = el.type === 'checkbox' ? el.checked : el.value;
     });
 
     const data = {
         funnel: funnelData,
         targetSales: document.getElementById('targetSales').value,
         avgPrice: document.getElementById('avgPrice').value,
+        strategyProduct: document.getElementById('strategyProductInput').value,
+        autoAI: document.getElementById('autoGenerateToggle').checked,
         checklist: Array.from(document.querySelectorAll('.checklist-items input')).map(i => i.checked)
     };
     localStorage.setItem('liveStrategyDataV2', JSON.stringify(data));
@@ -124,8 +126,10 @@ function loadData() {
             });
         }
 
-        document.getElementById('targetSales').value = data.targetSales || '';
-        document.getElementById('avgPrice').value = data.avgPrice || '';
+        if (document.getElementById('targetSales')) document.getElementById('targetSales').value = data.targetSales || '';
+        if (document.getElementById('avgPrice')) document.getElementById('avgPrice').value = data.avgPrice || '';
+        if (document.getElementById('strategyProductInput')) document.getElementById('strategyProductInput').value = data.strategyProduct || '';
+        if (document.getElementById('autoGenerateToggle')) document.getElementById('autoGenerateToggle').checked = data.autoAI !== false;
 
         const checks = document.querySelectorAll('.checklist-items input');
         data.checklist?.forEach((c, idx) => {
@@ -281,8 +285,228 @@ Terima kasih semua yang dah grab! Korang memang bijak!"
     }
 }
 
+// --- AI & MODAL LOGIC ---
+
+function openSettings() {
+    document.getElementById('settingsModal').classList.add('active');
+    const savedKey = localStorage.getItem('geminiApiKey');
+    if (savedKey) document.getElementById('geminiApiKey').value = savedKey;
+}
+
+function closeSettings() {
+    document.getElementById('settingsModal').classList.remove('active');
+}
+
+function saveSettings() {
+    const key = document.getElementById('geminiApiKey').value.trim();
+    localStorage.setItem('geminiApiKey', key);
+    alert('Tetapan telah disimpan! ✨');
+    closeSettings();
+}
+
+async function callGemini(prompt) {
+    const apiKey = localStorage.getItem('geminiApiKey');
+    if (!apiKey) {
+        alert("Sila masukkan Gemini API Key di bahagian Tetapan (ikon ⚙️) untuk menggunakan fungsi ini.");
+        openSettings();
+        return null;
+    }
+
+    try {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: prompt }] }]
+            })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error?.message || "Ralat API");
+        }
+
+        const data = await response.json();
+
+        if (!data.candidates || data.candidates.length === 0) {
+            // Safety filter or empty response
+            if (data.promptFeedback?.blockReason) {
+                throw new Error(`AI menyekat permintaan ini: ${data.promptFeedback.blockReason}`);
+            }
+            throw new Error("AI tidak memberikan jawapan. Sila cuba lagi dengan prompt yang berbeza.");
+        }
+
+        const text = data.candidates[0].content.parts[0].text.trim();
+        return text.replace(/\*\*/g, '').replace(/^"|"$/g, '');
+    } catch (error) {
+        console.error("Gemini Error:", error);
+        alert("Ralat AI: " + error.message);
+        return null;
+    }
+}
+
+async function suggestAI(fieldId, btnEl = null, context = 'script') {
+    const btn = btnEl || (typeof event !== 'undefined' ? event.currentTarget : null);
+    if (!btn) return;
+
+    const productNameInput = document.getElementById(context === 'script' ? 'productName' : 'strategyProductInput');
+    const productName = productNameInput ? productNameInput.value.trim() : "";
+
+    if (!productName) {
+        alert("Sila masukkan Nama Produk dahulu.");
+        productNameInput?.focus();
+        return;
+    }
+
+    const originalText = btn.innerHTML;
+    btn.classList.add('loading');
+    btn.innerHTML = '✨...';
+
+    let prompt = "";
+    if (context === 'script') {
+        const prompts = {
+            targetAudience: `Berikan 1 baris target audience yang spesifik untuk produk: ${productName}. Contoh: Suri rumah yang ingin menambah pendapatan.`,
+            mainProblem: `Berikan 1 atau 2 ayat mengenai masalah utama yang dihadapi pelanggan berkaitan produk: ${productName}.`,
+            uniqueFeatures: `Senaraikan 3 kelebihan utama produk: ${productName} dalam bentuk poin ringkas.`,
+        };
+        prompt = prompts[fieldId] || `Berikan idea kreatif untuk input ${fieldId} bagi produk ${productName}.`;
+    } else {
+        // Funnel strategy context
+        const fieldMap = {
+            morningV1: "Video 1 (View Objective) untuk Fasa Pagi",
+            morningV2: "Video 2 (Ads Beg Kuning) untuk Fasa Pagi",
+            morningV3: "Video 3 (Jemput Live) untuk Fasa Pagi",
+            noonV1: "Video 1 (View Objective) untuk Fasa Tengah Hari",
+            noonV2: "Video 2 (Ads Beg Kuning) untuk Fasa Tengah Hari",
+            noonV3: "Video 3 (Jemput Live) untuk Fasa Tengah Hari",
+            nightV1: "Video 1 (View Objective) untuk Fasa Malam",
+            nightV2: "Video 2 (Ads Beg Kuning) untuk Fasa Malam",
+            nightV3: "Video 3 (Jemput Live) untuk Fasa Malam",
+        };
+        prompt = `Tuliskan 1 plot cerita pendek (naratif) untuk TikTok bagi ${fieldMap[fieldId] || fieldId} berkaitan produk: ${productName}. Pastikan ia ringkas dan berkesan.`;
+    }
+
+    const result = await callGemini(prompt);
+    if (result) {
+        document.getElementById(fieldId).value = result;
+        saveData();
+    }
+
+    btn.classList.remove('loading');
+    btn.innerHTML = originalText;
+}
+
+async function suggestPhaseAI(phase, btnEl = null) {
+    const btn = btnEl || (typeof event !== 'undefined' ? event.currentTarget : null);
+    if (!btn) return;
+
+    const productName = document.getElementById('strategyProductInput').value.trim();
+    if (!productName) {
+        alert("Sila masukkan Nama Produk di seksyen Smart Plot Generator.");
+        document.getElementById('strategyProductInput').focus();
+        return;
+    }
+
+    const originalText = btn.innerHTML;
+    btn.classList.add('loading');
+    btn.innerHTML = '✨...';
+    const phaseNames = { morning: "Fasa Pagi", noon: "Fasa Tengah Hari", night: "Fasa Malam" };
+
+    const prompt = `Hasilkan 3 plot video pendek (naratif) untuk TikTok bagi ${phaseNames[phase]} untuk mempromosikan ${productName}.
+    Video 1: Fokus pada Engagement/View (Tips/Masalah).
+    Video 2: Fokus pada Soft Sell (Tunjuk Beg Kuning).
+    Video 3: Fokus pada Jemputan ke Live (Urgency).
+    Berikan output dalam format JSON yang mengandungi kunci "v1", "v2", dan "v3". Jangan sertakan teks lain!`;
+
+    const result = await callGemini(prompt);
+    if (result) {
+        try {
+            // Clean JSON in case AI adds markdown blocks
+            const cleanJson = result.replace(/```json|```/g, '').trim();
+            const data = JSON.parse(cleanJson);
+            document.getElementById(phase + 'V1').value = data.v1;
+            document.getElementById(phase + 'V2').value = data.v2;
+            document.getElementById(phase + 'V3').value = data.v3;
+            saveData();
+        } catch (e) {
+            console.error("JSON Parse Error", e);
+            // Fallback: split by lines if not JSON
+            const lines = result.split('\n').filter(l => l.length > 5);
+            if (lines.length >= 1) document.getElementById(phase + 'V1').value = lines[0];
+            if (lines.length >= 2) document.getElementById(phase + 'V2').value = lines[1];
+            if (lines.length >= 3) document.getElementById(phase + 'V3').value = lines[2];
+        }
+    }
+
+    btn.classList.remove('loading');
+    btn.innerHTML = originalText;
+}
+
+async function generateAllPlots() {
+    const productName = document.getElementById('strategyProductInput').value;
+    const useAI = document.getElementById('autoGenerateToggle').checked;
+
+    if (!productName) {
+        alert("Sila masukkan nama produk anda terlebih dahulu.");
+        return;
+    }
+
+    if (!useAI) {
+        alert("Mod 'Gunakan Magic AI' dimatikan. Sila aktifkan toggle untuk menjana secara automatik.");
+        return;
+    }
+
+    const btn = document.getElementById('generateAllPlotsBtn');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = "⏳ Menjana Strategi Lengkap...";
+    btn.disabled = true;
+
+    // Sequential generate to avoid token overload or race conditions
+    await suggestPhaseAI_Internal('morning', productName);
+    await suggestPhaseAI_Internal('noon', productName);
+    await suggestPhaseAI_Internal('night', productName);
+
+    btn.innerHTML = originalText;
+    btn.disabled = false;
+    alert("Strategi untuk semua fasa telah berjaya dijana! 🚀");
+}
+
+// Internal version of suggestPhaseAI for bulk generation (no UI feedback on button)
+async function suggestPhaseAI_Internal(phase, productName) {
+    const phaseNames = { morning: "Fasa Pagi", noon: "Fasa Tengah Hari", night: "Fasa Malam" };
+    const prompt = `Hasilkan 3 plot video pendek (naratif) untuk TikTok bagi ${phaseNames[phase]} untuk mempromosikan ${productName}.
+    Video 1: Fokus pada Engagement/View (Tips/Masalah).
+    Video 2: Fokus pada Soft Sell (Tunjuk Beg Kuning).
+    Video 3: Fokus pada Jemputan ke Live (Urgency).
+    Berikan output dalam format JSON yang mengandungi kunci "v1", "v2", dan "v3". Jangan sertakan teks lain!`;
+
+    const result = await callGemini(prompt);
+    if (result) {
+        try {
+            const cleanJson = result.replace(/```json|```/g, '').trim();
+            const data = JSON.parse(cleanJson);
+            document.getElementById(phase + 'V1').value = data.v1;
+            document.getElementById(phase + 'V2').value = data.v2;
+            document.getElementById(phase + 'V3').value = data.v3;
+            saveData();
+        } catch (e) {
+            const lines = result.split('\n').filter(l => l.length > 5);
+            if (lines[0]) document.getElementById(phase + 'V1').value = lines[0];
+            if (lines[1]) document.getElementById(phase + 'V2').value = lines[1];
+            if (lines[2]) document.getElementById(phase + 'V3').value = lines[2];
+        }
+    }
+}
+
+document.getElementById('generateAllPlotsBtn')?.addEventListener('click', generateAllPlots);
+
 function copyToClipboard() {
     const scriptText = document.getElementById('scriptResult').innerText;
+    if (!scriptText || scriptText.includes("Isi borang di sebelah")) {
+        alert("Tiada skrip untuk disalin!");
+        return;
+    }
+
     navigator.clipboard.writeText(scriptText).then(() => {
         const copyBtn = document.getElementById('copyBtn');
         const originalText = copyBtn.innerText;

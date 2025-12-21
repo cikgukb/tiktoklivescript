@@ -14,13 +14,16 @@
         <header class="header">
             <div class="header-top">
                 <h1>TikTok Shop Live Script Pro 🚀</h1>
-                <div class="theme-toggle-container">
-                    <span>🎨 Tema:</span>
-                    <select id="themeSelect" onchange="switchTheme(this.value)">
-                        <option value="dark">🌙 Dark</option>
-                        <option value="light">☀️ Light</option>
-                        <option value="system">💻 System</option>
-                    </select>
+                <div class="header-actions">
+                    <button id="settingsBtn" class="icon-btn" onclick="openSettings()" title="Tetapan AI">⚙️</button>
+                    <div class="theme-toggle-container">
+                        <span>🎨 Tema:</span>
+                        <select id="themeSelect" onchange="switchTheme(this.value)">
+                            <option value="dark">🌙 Dark</option>
+                            <option value="light">☀️ Light</option>
+                            <option value="system">💻 System</option>
+                        </select>
+                    </div>
                 </div>
             </div>
             <p>Hasilkan Skrip Jualan & Konten Mengikut Standard TikTok Shop Malaysia</p>
@@ -55,12 +58,21 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="targetAudience">Siapa Pelanggan Anda?</label>
+                        <div class="label-with-ai">
+                            <label for="targetAudience">Siapa Pelanggan Anda?</label>
+                            <button class="ai-magic-btn" onclick="suggestAI('targetAudience', this)"
+                                title="Jana Idea AI">✨
+                                Magic</button>
+                        </div>
                         <input type="text" id="targetAudience" placeholder="Contoh: Suri rumah yang sibuk">
                     </div>
 
                     <div class="form-group">
-                        <label for="mainProblem">Masalah / Keperluan Pembelian</label>
+                        <div class="label-with-ai">
+                            <label for="mainProblem">Masalah / Keperluan Pembelian</label>
+                            <button class="ai-magic-btn" onclick="suggestAI('mainProblem', this)" title="Jana Idea AI">✨
+                                Magic</button>
+                        </div>
                         <textarea id="mainProblem"
                             placeholder="Contoh: Tiada masa nak masak, tapi nak makan sedap."></textarea>
                     </div>
@@ -72,7 +84,12 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="uniqueFeatures">Kelebihan & Ciri-ciri Utama</label>
+                        <div class="label-with-ai">
+                            <label for="uniqueFeatures">Kelebihan & Ciri-ciri Utama</label>
+                            <button class="ai-magic-btn" onclick="suggestAI('uniqueFeatures', this)"
+                                title="Jana Idea AI">✨
+                                Magic</button>
+                        </div>
                         <textarea id="uniqueFeatures"
                             placeholder="Contoh: Pedas menyengat, Tahan 6 bulan, Tanpa pengawet."></textarea>
                     </div>
@@ -139,6 +156,37 @@
         <!-- Tab 2: Live Strategy -->
         <div id="strategyContent" class="main-tab-content">
             <div class="strategy-grid">
+                <!-- Smart Plot Generator Section -->
+                <section class="strategy-card generator-card">
+                    <div class="header-with-badge">
+                        <h2>✨ Smart Plot Generator</h2>
+                        <span class="badge ai-badge">AI POWERED</span>
+                    </div>
+                    <p class="card-desc">Masukkan maklumat produk anda dan biar AI janakan plot video funnel yang
+                        berkesan untuk sepanjang hari.</p>
+
+                    <div class="form-group">
+                        <label for="strategyProductInput">Nama Produk / Servis</label>
+                        <input type="text" id="strategyProductInput"
+                            placeholder="Contoh: Sambal Garing Nyet / Kurta Slim Fit">
+                    </div>
+
+                    <div class="generator-options">
+                        <div class="option-toggle">
+                            <label class="switch">
+                                <input type="checkbox" id="autoGenerateToggle" checked>
+                                <span class="slider round"></span>
+                            </label>
+                            <span>Gunakan Magic AI (Automatis)</span>
+                        </div>
+                    </div>
+
+                    <button id="generateAllPlotsBtn" class="primary-ai-btn">
+                        🚀 Jana Plot Untuk Semua Fasa
+                    </button>
+                    <p class="small-note" style="text-align: center; margin-top: 10px;">*Sila pastikan Gemini API Key
+                        telah disimpan di Tetapan ⚙️</p>
+                </section>
                 <!-- Section: Checklist -->
                 <section class="strategy-card checklist-card">
                     <h2>📋 Pre-Flight Checklist</h2>
@@ -199,9 +247,17 @@
                     <div class="funnel-phases">
                         <!-- Morning -->
                         <div class="phase-container">
-                            <h3>🌅 Fasa Pagi</h3>
+                            <div class="phase-header">
+                                <h3>🌅 Fasa Pagi</h3>
+                                <button class="ai-magic-btn bulk-ai" onclick="suggestPhaseAI('morning', this)"
+                                    title="Jana 3 Video (Fasa Pagi)">✨ Bulk Magic</button>
+                            </div>
                             <div class="video-item">
-                                <label>Video 1: View Objective</label>
+                                <div class="label-with-ai">
+                                    <label>Video 1: View Objective</label>
+                                    <button class="ai-magic-btn" onclick="suggestAI('morningV1', this, 'funnel')"
+                                        title="Jana Idea AI">✨ Magic</button>
+                                </div>
                                 <textarea id="morningV1" placeholder="Naratif Video 1..."></textarea>
                                 <div class="nested-checklist">
                                     <label><input type="checkbox" id="mChecksV1_1"> Custom Audience (75% View)</label>
@@ -209,20 +265,36 @@
                                 </div>
                             </div>
                             <div class="video-item">
-                                <label>Video 2: Ads Beg Kuning</label>
+                                <div class="label-with-ai">
+                                    <label>Video 2: Ads Beg Kuning</label>
+                                    <button class="ai-magic-btn" onclick="suggestAI('morningV2', this, 'funnel')"
+                                        title="Jana Idea AI">✨ Magic</button>
+                                </div>
                                 <textarea id="morningV2" placeholder="Naratif Video 2..."></textarea>
                             </div>
                             <div class="video-item">
-                                <label>Video 3: Menjemput ke Live</label>
+                                <div class="label-with-ai">
+                                    <label>Video 3: Menjemput ke Live</label>
+                                    <button class="ai-magic-btn" onclick="suggestAI('morningV3', this, 'funnel')"
+                                        title="Jana Idea AI">✨ Magic</button>
+                                </div>
                                 <textarea id="morningV3" placeholder="Naratif Video 3..."></textarea>
                             </div>
                         </div>
 
                         <!-- Noon -->
                         <div class="phase-container">
-                            <h3>☀️ Fasa Tengah Hari</h3>
+                            <div class="phase-header">
+                                <h3>☀️ Fasa Tengah Hari</h3>
+                                <button class="ai-magic-btn bulk-ai" onclick="suggestPhaseAI('noon', this)"
+                                    title="Jana 3 Video (Fasa Tengah Hari)">✨ Bulk Magic</button>
+                            </div>
                             <div class="video-item">
-                                <label>Video 1: View Objective</label>
+                                <div class="label-with-ai">
+                                    <label>Video 1: View Objective</label>
+                                    <button class="ai-magic-btn" onclick="suggestAI('noonV1', this, 'funnel')"
+                                        title="Jana Idea AI">✨ Magic</button>
+                                </div>
                                 <textarea id="noonV1" placeholder="Naratif Video 1..."></textarea>
                                 <div class="nested-checklist">
                                     <label><input type="checkbox" id="nChecksV1_1"> Custom Audience (75% View)</label>
@@ -230,20 +302,36 @@
                                 </div>
                             </div>
                             <div class="video-item">
-                                <label>Video 2: Ads Beg Kuning</label>
+                                <div class="label-with-ai">
+                                    <label>Video 2: Ads Beg Kuning</label>
+                                    <button class="ai-magic-btn" onclick="suggestAI('noonV2', this, 'funnel')"
+                                        title="Jana Idea AI">✨ Magic</button>
+                                </div>
                                 <textarea id="noonV2" placeholder="Naratif Video 2..."></textarea>
                             </div>
                             <div class="video-item">
-                                <label>Video 3: Menjemput ke Live</label>
+                                <div class="label-with-ai">
+                                    <label>Video 3: Menjemput ke Live</label>
+                                    <button class="ai-magic-btn" onclick="suggestAI('noonV3', this, 'funnel')"
+                                        title="Jana Idea AI">✨ Magic</button>
+                                </div>
                                 <textarea id="noonV3" placeholder="Naratif Video 3..."></textarea>
                             </div>
                         </div>
 
                         <!-- Night -->
                         <div class="phase-container">
-                            <h3>🌙 Fasa Malam</h3>
+                            <div class="phase-header">
+                                <h3>🌙 Fasa Malam</h3>
+                                <button class="ai-magic-btn bulk-ai" onclick="suggestPhaseAI('night', this)"
+                                    title="Jana 3 Video (Fasa Malam)">✨ Bulk Magic</button>
+                            </div>
                             <div class="video-item">
-                                <label>Video 1: View Objective</label>
+                                <div class="label-with-ai">
+                                    <label>Video 1: View Objective</label>
+                                    <button class="ai-magic-btn" onclick="suggestAI('nightV1', this, 'funnel')"
+                                        title="Jana Idea AI">✨ Magic</button>
+                                </div>
                                 <textarea id="nightV1" placeholder="Naratif Video 1..."></textarea>
                                 <div class="nested-checklist">
                                     <label><input type="checkbox" id="niChecksV1_1"> Custom Audience (75% View)</label>
@@ -251,16 +339,48 @@
                                 </div>
                             </div>
                             <div class="video-item">
-                                <label>Video 2: Ads Beg Kuning</label>
+                                <div class="label-with-ai">
+                                    <label>Video 2: Ads Beg Kuning</label>
+                                    <button class="ai-magic-btn" onclick="suggestAI('nightV2', this, 'funnel')"
+                                        title="Jana Idea AI">✨ Magic</button>
+                                </div>
                                 <textarea id="nightV2" placeholder="Naratif Video 2..."></textarea>
                             </div>
                             <div class="video-item">
-                                <label>Video 3: Menjemput ke Live</label>
+                                <div class="label-with-ai">
+                                    <label>Video 3: Menjemput ke Live</label>
+                                    <button class="ai-magic-btn" onclick="suggestAI('nightV3', this, 'funnel')"
+                                        title="Jana Idea AI">✨ Magic</button>
+                                </div>
                                 <textarea id="nightV3" placeholder="Naratif Video 3..."></textarea>
                             </div>
                         </div>
                     </div>
                 </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Settings Modal -->
+    <div id="settingsModal" class="modal-backdrop">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>⚙️ Tetapan AI (Gemini)</h2>
+                <button class="close-modal" onclick="closeSettings()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Masukkan Google Gemini API Key anda untuk menggunakan fungsi "Magic".</p>
+                <div class="form-group">
+                    <label>Gemini API Key</label>
+                    <input type="password" id="geminiApiKey" placeholder="AIzaSy...">
+                </div>
+                <div class="api-help">
+                    <p>Belum ada API Key? <a href="https://aistudio.google.com/app/apikey" target="_blank">Dapatkan di
+                            sini (Percuma)</a></p>
+                </div>
+                <div class="modal-footer">
+                    <button class="save-api-btn" onclick="saveSettings()">Simpan Tetapan</button>
+                </div>
             </div>
         </div>
     </div>
