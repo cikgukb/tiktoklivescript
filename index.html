@@ -12,7 +12,17 @@
 <body>
     <div class="container">
         <header class="header">
-            <h1>TikTok Shop Live Script Pro 🚀</h1>
+            <div class="header-top">
+                <h1>TikTok Shop Live Script Pro 🚀</h1>
+                <div class="theme-toggle-container">
+                    <span>🎨 Tema:</span>
+                    <select id="themeSelect" onchange="switchTheme(this.value)">
+                        <option value="dark">🌙 Dark</option>
+                        <option value="light">☀️ Light</option>
+                        <option value="system">💻 System</option>
+                    </select>
+                </div>
+            </div>
             <p>Hasilkan Skrip Jualan & Konten Mengikut Standard TikTok Shop Malaysia</p>
 
             <div class="main-tabs">
@@ -141,16 +151,16 @@
                             <input type="checkbox"> <span>Audio bersih (Guna mic jika perlu)</span>
                         </label>
                         <label class="check-item">
-                            <input type="checkbox"> <span>Internet stabil (Guna 4G/5G atau WiFi kuat)</span>
+                            <input type="checkbox"> <span>Internet stabil (Guna WiFi/Data kuat)</span>
                         </label>
                         <label class="check-item">
                             <input type="checkbox"> <span>Sampel produk sedia di depan mata</span>
                         </label>
                         <label class="check-item">
-                            <input type="checkbox"> <span>Bateri fon penuh atau tancap charger</span>
+                            <input type="checkbox"> <span>Bateri telefon penuh atau tancap charger</span>
                         </label>
                         <label class="check-item">
-                            <input type="checkbox"> <span>Beg kuning sudah dipin (Pinned product)</span>
+                            <input type="checkbox"> <span>Beg kuning atau beg biru sudah dipin</span>
                         </label>
                     </div>
                 </section>
@@ -180,29 +190,74 @@
                     <p class="small-note">*Berdasarkan anggaran ROAS 5.0 (Standard TikTok Shop)</p>
                 </section>
 
-                <!-- Section: Story Builder / Funnel -->
                 <section class="strategy-card funnel-card">
                     <div class="funnel-header">
-                        <h2>🎬 Video Funnel Strategy</h2>
-                        <button class="export-btn" onclick="exportStrategy()">Salin Rancangan</button>
+                        <h2>🎬 Video Funnel Strategy (1 Jam Sebelum Live)</h2>
+                        <button class="export-btn" onclick="exportStrategy()">Salin Strategi</button>
                     </div>
-                    <p class="card-desc">Rancangan 3 fasa (Morning, Noon, Night) untuk semarakkan Live.</p>
 
                     <div class="funnel-phases">
-                        <div class="phase-box">
-                            <h3>🌅 Pagi (Traffic Booster)</h3>
-                            <textarea id="storyMorning"
-                                placeholder="Video 1: Hook & Review. Video 2: Demo Produk."></textarea>
+                        <!-- Morning -->
+                        <div class="phase-container">
+                            <h3>🌅 Fasa Pagi</h3>
+                            <div class="video-item">
+                                <label>Video 1: View Objective</label>
+                                <textarea id="morningV1" placeholder="Naratif Video 1..."></textarea>
+                                <div class="nested-checklist">
+                                    <label><input type="checkbox" id="mChecksV1_1"> Custom Audience (75% View)</label>
+                                    <label><input type="checkbox" id="mChecksV1_2"> Lookalike Audience</label>
+                                </div>
+                            </div>
+                            <div class="video-item">
+                                <label>Video 2: Ads Beg Kuning</label>
+                                <textarea id="morningV2" placeholder="Naratif Video 2..."></textarea>
+                            </div>
+                            <div class="video-item">
+                                <label>Video 3: Menjemput ke Live</label>
+                                <textarea id="morningV3" placeholder="Naratif Video 3..."></textarea>
+                            </div>
                         </div>
-                        <div class="phase-box">
-                            <h3>☀️ Tengah Hari (Conversion)</h3>
-                            <textarea id="storyNoon"
-                                placeholder="Video 1: Unboxing. Video 2: Harga Eksklusif."></textarea>
+
+                        <!-- Noon -->
+                        <div class="phase-container">
+                            <h3>☀️ Fasa Tengah Hari</h3>
+                            <div class="video-item">
+                                <label>Video 1: View Objective</label>
+                                <textarea id="noonV1" placeholder="Naratif Video 1..."></textarea>
+                                <div class="nested-checklist">
+                                    <label><input type="checkbox" id="nChecksV1_1"> Custom Audience (75% View)</label>
+                                    <label><input type="checkbox" id="nChecksV1_2"> Lookalike Audience</label>
+                                </div>
+                            </div>
+                            <div class="video-item">
+                                <label>Video 2: Ads Beg Kuning</label>
+                                <textarea id="noonV2" placeholder="Naratif Video 2..."></textarea>
+                            </div>
+                            <div class="video-item">
+                                <label>Video 3: Menjemput ke Live</label>
+                                <textarea id="noonV3" placeholder="Naratif Video 3..."></textarea>
+                            </div>
                         </div>
-                        <div class="phase-box">
-                            <h3>🌙 Malam (Retargeting)</h3>
-                            <textarea id="storyNight"
-                                placeholder="Video 1: Last Call. Video 2: Countdown stok."></textarea>
+
+                        <!-- Night -->
+                        <div class="phase-container">
+                            <h3>🌙 Fasa Malam</h3>
+                            <div class="video-item">
+                                <label>Video 1: View Objective</label>
+                                <textarea id="nightV1" placeholder="Naratif Video 1..."></textarea>
+                                <div class="nested-checklist">
+                                    <label><input type="checkbox" id="niChecksV1_1"> Custom Audience (75% View)</label>
+                                    <label><input type="checkbox" id="niChecksV1_2"> Lookalike Audience</label>
+                                </div>
+                            </div>
+                            <div class="video-item">
+                                <label>Video 2: Ads Beg Kuning</label>
+                                <textarea id="nightV2" placeholder="Naratif Video 2..."></textarea>
+                            </div>
+                            <div class="video-item">
+                                <label>Video 3: Menjemput ke Live</label>
+                                <textarea id="nightV3" placeholder="Naratif Video 3..."></textarea>
+                            </div>
                         </div>
                     </div>
                 </section>

@@ -11,6 +11,17 @@ function switchMainTab(tab) {
     localStorage.setItem('activeMainTab', tab);
 }
 
+// Theme Switching Logic
+function switchTheme(theme) {
+    if (theme === 'system') {
+        const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.body.setAttribute('data-theme', isDark ? 'dark' : 'light');
+    } else {
+        document.body.setAttribute('data-theme', theme);
+    }
+    localStorage.setItem('preferredTheme', theme);
+}
+
 function setMode(mode) {
     currentMode = mode;
     document.getElementById('modeVideo').classList.toggle('active', mode === 'video');
@@ -40,22 +51,34 @@ function calculateAds() {
 }
 
 // Strategy Export Logic
+// Strategy Export Logic
 function exportStrategy() {
-    const morning = document.getElementById('storyMorning').value;
-    const noon = document.getElementById('storyNoon').value;
-    const night = document.getElementById('storyNight').value;
+    const getVal = (id) => document.getElementById(id).value || "Belum diisi";
+    const getCheck = (id) => document.getElementById(id).checked ? " [OK]" : " [ ]";
 
     const text = `
-🚀 TIKTOK LIVE FUNNEL STRATEGY
-------------------------------
-🌅 PAGI (TRAFFIC BOOSTER):
-${morning || "Belum diisi"}
+🚀 TIKTOK LIVE FUNNEL STRATEGY (DETAIL)
+----------------------------------------
+🌅 FASA PAGI:
+Video 1 (View): ${getVal('morningV1')}
+- Custom Audience (75% View):${getCheck('mChecksV1_1')}
+- Lookalike Audience:${getCheck('mChecksV1_2')}
+Video 2 (Yellow Bag): ${getVal('morningV2')}
+Video 3 (Invite): ${getVal('morningV3')}
 
-☀️ TENGAH HARI (CONVERSION):
-${noon || "Belum diisi"}
+☀️ FASA TENGAH HARI:
+Video 1 (View): ${getVal('noonV1')}
+- Custom Audience (75% View):${getCheck('nChecksV1_1')}
+- Lookalike Audience:${getCheck('nChecksV1_2')}
+Video 2 (Yellow Bag): ${getVal('noonV2')}
+Video 3 (Invite): ${getVal('noonV3')}
 
-🌙 MALAM (RETARGETING):
-${night || "Belum diisi"}
+🌙 FASA MALAM:
+Video 1 (View): ${getVal('nightV1')}
+- Custom Audience (75% View):${getCheck('niChecksV1_1')}
+- Lookalike Audience:${getCheck('niChecksV1_2')}
+Video 2 (Yellow Bag): ${getVal('nightV2')}
+Video 3 (Invite): ${getVal('nightV3')}
     `.trim();
 
     navigator.clipboard.writeText(text).then(() => {
@@ -65,24 +88,42 @@ ${night || "Belum diisi"}
 
 // Persistence Logic
 function saveData() {
+    const funnelData = {};
+    const ids = [
+        'morningV1', 'morningV2', 'morningV3', 'mChecksV1_1', 'mChecksV1_2',
+        'noonV1', 'noonV2', 'noonV3', 'nChecksV1_1', 'nChecksV1_2',
+        'nightV1', 'nightV2', 'nightV3', 'niChecksV1_1', 'niChecksV1_2'
+    ];
+    ids.forEach(id => {
+        const el = document.getElementById(id);
+        funnelData[id] = el.type === 'checkbox' ? el.checked : el.value;
+    });
+
     const data = {
-        morning: document.getElementById('storyMorning').value,
-        noon: document.getElementById('storyNoon').value,
-        night: document.getElementById('storyNight').value,
+        funnel: funnelData,
         targetSales: document.getElementById('targetSales').value,
         avgPrice: document.getElementById('avgPrice').value,
         checklist: Array.from(document.querySelectorAll('.checklist-items input')).map(i => i.checked)
     };
-    localStorage.setItem('liveStrategyData', JSON.stringify(data));
+    localStorage.setItem('liveStrategyDataV2', JSON.stringify(data));
 }
 
 function loadData() {
-    const saved = localStorage.getItem('liveStrategyData');
+    const saved = localStorage.getItem('liveStrategyDataV2');
     if (saved) {
         const data = JSON.parse(saved);
-        document.getElementById('storyMorning').value = data.morning || '';
-        document.getElementById('storyNoon').value = data.noon || '';
-        document.getElementById('storyNight').value = data.night || '';
+
+        // Load Funnel Data
+        if (data.funnel) {
+            Object.keys(data.funnel).forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    if (el.type === 'checkbox') el.checked = data.funnel[id];
+                    else el.value = data.funnel[id];
+                }
+            });
+        }
+
         document.getElementById('targetSales').value = data.targetSales || '';
         document.getElementById('avgPrice').value = data.avgPrice || '';
 
@@ -98,8 +139,15 @@ function loadData() {
 // Initialize
 window.onload = () => {
     loadData();
+
+    // Set Tab
     const activeTab = localStorage.getItem('activeMainTab') || 'script';
     switchMainTab(activeTab);
+
+    // Set Theme
+    const preferredTheme = localStorage.getItem('preferredTheme') || 'dark';
+    document.getElementById('themeSelect').value = preferredTheme;
+    switchTheme(preferredTheme);
 
     // Add event listeners for auto-save
     const inputs = document.querySelectorAll('#strategyContent textarea, #strategyContent input');
