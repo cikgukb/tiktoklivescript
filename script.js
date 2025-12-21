@@ -1,21 +1,20 @@
 let currentMode = 'video';
 
+// Tab Switching Logic
+function switchMainTab(tab) {
+    document.getElementById('scriptContent').classList.toggle('active', tab === 'script');
+    document.getElementById('strategyContent').classList.toggle('active', tab === 'strategy');
+    document.getElementById('tabScript').classList.toggle('active', tab === 'script');
+    document.getElementById('tabStrategy').classList.toggle('active', tab === 'strategy');
+
+    // Save current tab to local storage
+    localStorage.setItem('activeMainTab', tab);
+}
+
 function setMode(mode) {
     currentMode = mode;
     document.getElementById('modeVideo').classList.toggle('active', mode === 'video');
     document.getElementById('modeLive').classList.toggle('active', mode === 'live');
-
-    // Toggle some fields based on mode if needed
-    const usageGroup = document.getElementById('usageGroup');
-    const testimonyGroup = document.getElementById('testimonyGroup');
-
-    if (mode === 'video') {
-        usageGroup.style.display = 'block';
-        testimonyGroup.style.display = 'block';
-    } else {
-        usageGroup.style.display = 'block';
-        testimonyGroup.style.display = 'block';
-    }
 }
 
 function setOffer(val) {
@@ -24,6 +23,91 @@ function setOffer(val) {
 
 document.getElementById('generateBtn').addEventListener('click', generateScript);
 document.getElementById('copyBtn').addEventListener('click', copyToClipboard);
+
+// Ads Calculation Logic
+function calculateAds() {
+    const targetSales = parseFloat(document.getElementById('targetSales').value) || 0;
+    const avgPrice = parseFloat(document.getElementById('avgPrice').value) || 0;
+
+    // Constant: ROAS (Return on Ad Spend) estimate for TikTok Shop
+    const ROAS = 5.0;
+
+    const budget = targetSales / ROAS;
+    const orders = avgPrice > 0 ? Math.ceil(targetSales / avgPrice) : 0;
+
+    document.getElementById('resBudget').innerText = `RM ${budget.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    document.getElementById('resOrders').innerText = orders.toLocaleString();
+}
+
+// Strategy Export Logic
+function exportStrategy() {
+    const morning = document.getElementById('storyMorning').value;
+    const noon = document.getElementById('storyNoon').value;
+    const night = document.getElementById('storyNight').value;
+
+    const text = `
+🚀 TIKTOK LIVE FUNNEL STRATEGY
+------------------------------
+🌅 PAGI (TRAFFIC BOOSTER):
+${morning || "Belum diisi"}
+
+☀️ TENGAH HARI (CONVERSION):
+${noon || "Belum diisi"}
+
+🌙 MALAM (RETARGETING):
+${night || "Belum diisi"}
+    `.trim();
+
+    navigator.clipboard.writeText(text).then(() => {
+        alert('Rancangan strategi berjaya disalin! 🚀');
+    });
+}
+
+// Persistence Logic
+function saveData() {
+    const data = {
+        morning: document.getElementById('storyMorning').value,
+        noon: document.getElementById('storyNoon').value,
+        night: document.getElementById('storyNight').value,
+        targetSales: document.getElementById('targetSales').value,
+        avgPrice: document.getElementById('avgPrice').value,
+        checklist: Array.from(document.querySelectorAll('.checklist-items input')).map(i => i.checked)
+    };
+    localStorage.setItem('liveStrategyData', JSON.stringify(data));
+}
+
+function loadData() {
+    const saved = localStorage.getItem('liveStrategyData');
+    if (saved) {
+        const data = JSON.parse(saved);
+        document.getElementById('storyMorning').value = data.morning || '';
+        document.getElementById('storyNoon').value = data.noon || '';
+        document.getElementById('storyNight').value = data.night || '';
+        document.getElementById('targetSales').value = data.targetSales || '';
+        document.getElementById('avgPrice').value = data.avgPrice || '';
+
+        const checks = document.querySelectorAll('.checklist-items input');
+        data.checklist?.forEach((c, idx) => {
+            if (checks[idx]) checks[idx].checked = c;
+        });
+
+        calculateAds();
+    }
+}
+
+// Initialize
+window.onload = () => {
+    loadData();
+    const activeTab = localStorage.getItem('activeMainTab') || 'script';
+    switchMainTab(activeTab);
+
+    // Add event listeners for auto-save
+    const inputs = document.querySelectorAll('#strategyContent textarea, #strategyContent input');
+    inputs.forEach(input => {
+        input.addEventListener('input', saveData);
+        input.addEventListener('change', saveData);
+    });
+};
 
 function generateScript() {
     const productName = document.getElementById('productName').value || "[Nama Produk]";
