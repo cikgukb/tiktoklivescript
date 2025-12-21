@@ -416,21 +416,29 @@ async function suggestPhaseAI(phase, btnEl = null) {
     Video 1: Fokus pada Engagement/View (Tips/Masalah).
     Video 2: Fokus pada Soft Sell (Tunjuk Beg Kuning).
     Video 3: Fokus pada Jemputan ke Live (Urgency).
-    Berikan output dalam format JSON yang mengandungi kunci "v1", "v2", dan "v3". Jangan sertakan teks lain!`;
+    
+    PENTING: Berikan output dalam format JSON SAHAJA.
+    Kunci wajib: "v1", "v2", "v3".
+    Nilai bagi setiap kunci mestilah SATU AYAT STRING PANJANG. JANGAN gunakan object nested atau array.
+    Contoh: {"v1": "Cerita tentang A...", "v2": "Cerita tentang B...", "v3": "Cerita tentang C..."}`;
 
     const result = await callGemini(prompt);
     if (result) {
         try {
-            // Clean JSON in case AI adds markdown blocks
             const cleanJson = result.replace(/```json|```/g, '').trim();
             const data = JSON.parse(cleanJson);
-            document.getElementById(phase + 'V1').value = data.v1;
-            document.getElementById(phase + 'V2').value = data.v2;
-            document.getElementById(phase + 'V3').value = data.v3;
+
+            const normalize = (val) => {
+                if (typeof val === 'object') return JSON.stringify(val);
+                return val;
+            };
+
+            document.getElementById(phase + 'V1').value = normalize(data.v1);
+            document.getElementById(phase + 'V2').value = normalize(data.v2);
+            document.getElementById(phase + 'V3').value = normalize(data.v3);
             saveData();
         } catch (e) {
             console.error("JSON Parse Error", e);
-            // Fallback: split by lines if not JSON
             const lines = result.split('\n').filter(l => l.length > 5);
             if (lines.length >= 1) document.getElementById(phase + 'V1').value = lines[0];
             if (lines.length >= 2) document.getElementById(phase + 'V2').value = lines[1];
@@ -478,16 +486,31 @@ async function suggestPhaseAI_Internal(phase, productName) {
     Video 1: Fokus pada Engagement/View (Tips/Masalah).
     Video 2: Fokus pada Soft Sell (Tunjuk Beg Kuning).
     Video 3: Fokus pada Jemputan ke Live (Urgency).
-    Berikan output dalam format JSON yang mengandungi kunci "v1", "v2", dan "v3". Jangan sertakan teks lain!`;
+    
+    PENTING: Berikan output dalam format JSON SAHAJA.
+    Kunci wajib: "v1", "v2", "v3".
+    Nilai mestilah STRING sahaja. JANGAN nested object.`;
 
     const result = await callGemini(prompt);
     if (result) {
         try {
             const cleanJson = result.replace(/```json|```/g, '').trim();
             const data = JSON.parse(cleanJson);
-            document.getElementById(phase + 'V1').value = data.v1;
-            document.getElementById(phase + 'V2').value = data.v2;
-            document.getElementById(phase + 'V3').value = data.v3;
+
+            const normalize = (val) => {
+                if (typeof val === 'object') {
+                    // Try to extract text content if common keys exist
+                    if (val.text) return val.text;
+                    if (val.script) return val.script;
+                    if (val.content) return val.content;
+                    return JSON.stringify(val);
+                }
+                return val;
+            };
+
+            document.getElementById(phase + 'V1').value = normalize(data.v1);
+            document.getElementById(phase + 'V2').value = normalize(data.v2);
+            document.getElementById(phase + 'V3').value = normalize(data.v3);
             saveData();
         } catch (e) {
             const lines = result.split('\n').filter(l => l.length > 5);
