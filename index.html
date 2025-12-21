@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ms">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TikTok Shop Live Script Pro | Penjana Skrip Jualan</title>
+    <meta name="description" content="Hasilkan skrip jualan yang berkesan untuk TikTok Shop Live dengan sekelip mata.">
+    <link rel="stylesheet" href="index.css">
+</head>
+
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>TikTok Shop Live Script Pro 🚀</h1>
+            <p>Hasilkan Skrip Jualan & Konten Mengikut Standard TikTok Shop Malaysia</p>
+
+            <div class="mode-toggle">
+                <button id="modeVideo" class="toggle-btn active" onclick="setMode('video')">Video Pendek (1m)</button>
+                <button id="modeLive" class="toggle-btn" onclick="setMode('live')">Live Stream</button>
+            </div>
+        </header>
+
+        <section class="input-section">
+            <div class="form-group">
+                <label for="scriptTone">Gaya Bahasa (Tone)</label>
+                <select id="scriptTone">
+                    <option value="santai">😊 Santai & Mesra (Friendly)</option>
+                    <option value="formal">💼 Professional & Formal</option>
+                    <option value="high energy">🔥 Bersemangat & Jualan (High Energy)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="productName">Nama Produk / Servis</label>
+                <input type="text" id="productName" placeholder="Contoh: Sambal Berapi Cik Yah">
+            </div>
+
+            <div class="form-group">
+                <label for="targetAudience">Siapa Pelanggan Anda?</label>
+                <input type="text" id="targetAudience" placeholder="Contoh: Suri rumah yang sibuk">
+            </div>
+
+            <div class="form-group">
+                <label for="mainProblem">Masalah / Keperluan Pembelian</label>
+                <textarea id="mainProblem" placeholder="Contoh: Tiada masa nak masak, tapi nak makan sedap."></textarea>
+            </div>
+
+            <div class="form-group" id="usageGroup">
+                <label for="usageInstructions">Cara Penggunaan</label>
+                <textarea id="usageInstructions"
+                    placeholder="Contoh: Buka penutup, tuang atas nasi panas, sedia dimakan!"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="uniqueFeatures">Kelebihan & Ciri-ciri Utama</label>
+                <textarea id="uniqueFeatures"
+                    placeholder="Contoh: Pedas menyengat, Tahan 6 bulan, Tanpa pengawet."></textarea>
+            </div>
+
+            <div class="form-group" id="testimonyGroup">
+                <label for="testimonials">Review / Testimoni Pelanggan</label>
+                <textarea id="testimonials"
+                    placeholder="Contoh: 'Suami saya tambah nasi 3 pinggan!' - Kak Tipah"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="offer">Harga & Tawaran Istimewa</label>
+                <input type="text" id="offer" placeholder="Contoh: Beli 2 Percuma 1 (30 minit sahaja!)">
+                <div class="preset-container">
+                    <span class="preset-label">Pilihan Pantas:</span>
+                    <div class="preset-tags">
+                        <button class="preset-tag" onclick="setOffer('LIVE Flash Sale (Eksklusif Live)')">🔥 LIVE Flash
+                            Sale</button>
+                        <button class="preset-tag" onclick="setOffer('Creator LIVE Deal (Harga Eksklusif)')">🌟 Creator
+                            LIVE Deal</button>
+                        <button class="preset-tag" onclick="setOffer('LIVE Coupon (Diskaun Terhad)')">🎫 LIVE
+                            Coupon</button>
+                        <button class="preset-tag" onclick="setOffer('Creator LIVE Giveaway (Hadiah Percuma)')">🎁
+                            Creator LIVE Giveaway</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="cta">Tindakan (CTA)</label>
+                <input type="text" id="cta" placeholder="Contoh: Klik beg kuning sekarang!">
+            </div>
+
+            <button id="generateBtn">Hasilkan Skrip ✨</button>
+        </section>
+
+        <section class="output-section">
+            <div class="compliance-tips">
+                <h3>💡 Tips Patuh Syarat (TikTok Shop)</h3>
+                <ul>
+                    <li>✅ Tunjukkan produk secara fizikal.</li>
+                    <li>🚫 Jangan janji berlebihan (e.g. 'Kurus dlm 1 jam').</li>
+                    <li>🚫 Elak bagi nombor telefon atau link luar.</li>
+                    <li>🚫 Elak live dalam kenderaan bergerak.</li>
+                </ul>
+            </div>
+            <label>Skrip Anda</label>
+            <div class="output-container">
+                <button id="copyBtn" class="copy-btn">Salin Skrip</button>
+                <div id="scriptResult">
+                    <p class="placeholder-text">Isi borang di sebelah dan klik "Hasilkan Skrip" untuk melihat magis
+                        berlaku... ✨</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
