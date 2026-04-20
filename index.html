@@ -184,7 +184,7 @@
                     <button id="generateAllPlotsBtn" class="primary-ai-btn">
                         🚀 Jana Plot Untuk Semua Fasa
                     </button>
-                    <p class="small-note" style="text-align: center; margin-top: 10px;">*Sila pastikan Gemini API Key
+                    <p class="small-note" style="text-align: center; margin-top: 10px;">*Sila pastikan Anthropic API Key
                         telah disimpan di Tetapan ⚙️</p>
                 </section>
                 <!-- Section: Checklist -->
@@ -365,18 +365,18 @@
     <div id="settingsModal" class="modal-backdrop">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>⚙️ Tetapan AI (Gemini)</h2>
+                <h2>⚙️ Tetapan AI (Claude)</h2>
                 <button class="close-modal" onclick="closeSettings()">&times;</button>
             </div>
             <div class="modal-body">
-                <p>Masukkan Google Gemini API Key anda untuk menggunakan fungsi "Magic".</p>
+                <p>Masukkan Anthropic Claude API Key anda untuk menggunakan fungsi "Magic".</p>
                 <div class="form-group">
-                    <label>Gemini API Key</label>
-                    <input type="password" id="geminiApiKey" placeholder="AIzaSy...">
+                    <label>Anthropic API Key</label>
+                    <input type="password" id="anthropicApiKey" placeholder="sk-ant-...">
                 </div>
                 <div class="api-help">
-                    <p>Belum ada API Key? <a href="https://aistudio.google.com/app/apikey" target="_blank">Dapatkan di
-                            sini (Percuma)</a></p>
+                    <p>Belum ada API Key? <a href="https://console.anthropic.com/settings/keys" target="_blank">Dapatkan di
+                            sini</a></p>
                 </div>
                 <div class="modal-footer">
                     <button class="save-api-btn" onclick="saveSettings()">Simpan Tetapan</button>

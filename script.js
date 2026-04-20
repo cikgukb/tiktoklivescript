@@ -289,8 +289,8 @@ Terima kasih semua yang dah grab! Korang memang bijak!"
 
 function openSettings() {
     document.getElementById('settingsModal').classList.add('active');
-    const savedKey = localStorage.getItem('geminiApiKey');
-    if (savedKey) document.getElementById('geminiApiKey').value = savedKey;
+    const savedKey = localStorage.getItem('anthropicApiKey');
+    if (savedKey) document.getElementById('anthropicApiKey').value = savedKey;
 }
 
 function closeSettings() {
@@ -298,26 +298,33 @@ function closeSettings() {
 }
 
 function saveSettings() {
-    const key = document.getElementById('geminiApiKey').value.trim();
-    localStorage.setItem('geminiApiKey', key);
+    const key = document.getElementById('anthropicApiKey').value.trim();
+    localStorage.setItem('anthropicApiKey', key);
     alert('Tetapan telah disimpan! ✨');
     closeSettings();
 }
 
-async function callGemini(prompt) {
-    const apiKey = localStorage.getItem('geminiApiKey');
+async function callClaude(prompt) {
+    const apiKey = localStorage.getItem('anthropicApiKey');
     if (!apiKey) {
-        alert("Sila masukkan Gemini API Key di bahagian Tetapan (ikon ⚙️) untuk menggunakan fungsi ini.");
+        alert("Sila masukkan Anthropic API Key di bahagian Tetapan (ikon ⚙️) untuk menggunakan fungsi ini.");
         openSettings();
         return null;
     }
 
     try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
+        const response = await fetch('https://api.anthropic.com/v1/messages', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'x-api-key': apiKey,
+                'anthropic-version': '2023-06-01',
+                'anthropic-dangerous-direct-browser-access': 'true'
+            },
             body: JSON.stringify({
-                contents: [{ parts: [{ text: prompt }] }]
+                model: 'claude-haiku-4-5',
+                max_tokens: 1024,
+                messages: [{ role: 'user', content: prompt }]
             })
         });
 
@@ -328,18 +335,17 @@ async function callGemini(prompt) {
 
         const data = await response.json();
 
-        if (!data.candidates || data.candidates.length === 0) {
-            // Safety filter or empty response
-            if (data.promptFeedback?.blockReason) {
-                throw new Error(`AI menyekat permintaan ini: ${data.promptFeedback.blockReason}`);
+        if (!data.content || data.content.length === 0) {
+            if (data.stop_reason === 'refusal') {
+                throw new Error("AI menyekat permintaan ini atas sebab keselamatan.");
             }
             throw new Error("AI tidak memberikan jawapan. Sila cuba lagi dengan prompt yang berbeza.");
         }
 
-        const text = data.candidates[0].content.parts[0].text.trim();
+        const text = data.content[0].text.trim();
         return text.replace(/\*\*/g, '').replace(/^"|"$/g, '');
     } catch (error) {
-        console.error("Gemini Error:", error);
+        console.error("Claude Error:", error);
         alert("Ralat AI: " + error.message);
         return null;
     }
@@ -386,7 +392,7 @@ async function suggestAI(fieldId, btnEl = null, context = 'script') {
         prompt = `Tuliskan 1 plot cerita pendek (naratif) untuk TikTok bagi ${fieldMap[fieldId] || fieldId} berkaitan produk: ${productName}. Pastikan ia ringkas dan berkesan.`;
     }
 
-    const result = await callGemini(prompt);
+    const result = await callClaude(prompt);
     if (result) {
         document.getElementById(fieldId).value = result;
         saveData();
@@ -422,7 +428,7 @@ async function suggestPhaseAI(phase, btnEl = null) {
     Nilai bagi setiap kunci mestilah SATU AYAT STRING PANJANG. JANGAN gunakan object nested atau array.
     Contoh: {"v1": "Cerita tentang A...", "v2": "Cerita tentang B...", "v3": "Cerita tentang C..."}`;
 
-    const result = await callGemini(prompt);
+    const result = await callClaude(prompt);
     if (result) {
         try {
             const cleanJson = result.replace(/```json|```/g, '').trim();
@@ -491,7 +497,7 @@ async function suggestPhaseAI_Internal(phase, productName) {
     Kunci wajib: "v1", "v2", "v3".
     Nilai mestilah STRING sahaja. JANGAN nested object.`;
 
-    const result = await callGemini(prompt);
+    const result = await callClaude(prompt);
     if (result) {
         try {
             const cleanJson = result.replace(/```json|```/g, '').trim();
